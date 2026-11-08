@@ -3,7 +3,7 @@ import { createServerClient } from "@supabase/ssr";
 import { getSupabaseEnv } from "./env";
 
 /** Pages that need a signed-in user. */
-const PROTECTED_PREFIXES = ["/app", "/dev"];
+const PROTECTED_PREFIXES = ["/app", "/dev", "/onboarding"];
 /** Pages that make no sense once you are signed in. */
 const GUEST_ONLY_PATHS = ["/login", "/signup", "/forgot-password"];
 
