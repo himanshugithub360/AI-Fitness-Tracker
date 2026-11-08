@@ -27,8 +27,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="en"
       className={`${displayFace.variable} ${bodyFace.variable} ${codeFace.variable} h-full`}
+      suppressHydrationWarning
     >
-      <body className="relative flex min-h-full flex-col">
+      {/* Browser extensions such as Grammarly add attributes to these two tags before React
+          loads, which causes a harmless hydration warning. suppressHydrationWarning hides it. */}
+      <body className="relative flex min-h-full flex-col" suppressHydrationWarning>
         <div className="aurora pointer-events-none fixed inset-0" aria-hidden="true">
           <div className="aurora-grid absolute inset-0" />
         </div>

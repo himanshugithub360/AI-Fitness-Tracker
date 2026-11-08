@@ -2,24 +2,40 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useActionState } from "react";
+import { useActionState, useSyncExternalStore } from "react";
 import { loginWithPassword, sendMagicLink } from "@/app/(auth)/actions";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { initialFormState } from "@/lib/auth/form-state";
+import { describeAuthLinkProblem, parseAuthHashError } from "@/lib/auth/hash-error";
 import { safeNextPath } from "@/lib/auth/redirects";
 import { Field, FormMessage } from "./form-parts";
 import { GoogleButton } from "./google-button";
+import { ResendForm } from "./resend-form";
 import { SubmitButton } from "./submit-button";
 
 const URL_ERRORS: Record<string, string> = {
-  auth: "That sign-in link did not work. Request a new one and try again.",
+  auth: "That email link did not work. It may have expired or been used already. Sign in below, or request a new one.",
   google: "Google sign-in is not available yet. Use your email instead.",
 };
+
+/** The part of the address after "#". Supabase reports failed email links there. */
+function subscribeToHash(onChange: () => void) {
+  window.addEventListener("hashchange", onChange);
+  return () => window.removeEventListener("hashchange", onChange);
+}
+const readHash = () => window.location.hash;
+const readHashOnServer = () => "";
 
 export function LoginForm() {
   const searchParams = useSearchParams();
   const next = safeNextPath(searchParams.get("next"));
-  const urlError = URL_ERRORS[searchParams.get("error") ?? ""];
+
+  const hash = useSyncExternalStore(subscribeToHash, readHash, readHashOnServer);
+  const linkProblem = parseAuthHashError(hash);
+  const urlError = linkProblem
+    ? describeAuthLinkProblem(linkProblem)
+    : URL_ERRORS[searchParams.get("error") ?? ""];
+  const showResend = Boolean(linkProblem) || searchParams.get("error") === "auth";
 
   const [passwordState, passwordAction] = useActionState(loginWithPassword, initialFormState);
   const [magicState, magicAction] = useActionState(sendMagicLink, initialFormState);
@@ -93,6 +109,8 @@ export function LoginForm() {
           </form>
         </TabsContent>
       </Tabs>
+
+      {showResend && <ResendForm />}
     </div>
   );
 }

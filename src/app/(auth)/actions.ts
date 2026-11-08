@@ -142,6 +142,27 @@ export async function updatePassword(_prev: FormState, formData: FormData): Prom
   redirect("/app");
 }
 
+export async function resendConfirmation(_prev: FormState, formData: FormData): Promise<FormState> {
+  const values = keep(formData, "email");
+  const parsed = magicLinkSchema.safeParse({ email: text(formData, "email") });
+  if (!parsed.success) return invalid(parsed.error, "Enter a valid email address.", values);
+
+  const supabase = await createClient();
+  const origin = await getOrigin();
+  const { error } = await supabase.auth.resend({
+    type: "signup",
+    email: parsed.data.email,
+    options: { emailRedirectTo: `${origin}/auth/callback?next=/app` },
+  });
+  if (error) return { error: friendlyAuthError(error), values };
+
+  // Same answer for every address, so nobody can probe for accounts.
+  return {
+    message:
+      "If that address is waiting for confirmation, a new link is on its way. Use only the newest email.",
+  };
+}
+
 export async function signOut(): Promise<void> {
   const supabase = await createClient();
   await supabase.auth.signOut();
