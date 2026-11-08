@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+/* Placeholder palette from the design mockup. Step 1.2 replaces this with the full APEX theme. */
+:root {
+  --background: #090b12;
+  --foreground: #eaeef8;
+  --muted: #8f98b3;
+  --ember: #ff6a3d;
+  --ice: #82d6ff;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-ember: var(--ember);
+  --color-ice: var(--ice);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
