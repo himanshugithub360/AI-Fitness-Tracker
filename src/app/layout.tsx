@@ -1,14 +1,19 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Bricolage_Grotesque, Instrument_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const displayFace = Bricolage_Grotesque({
+  variable: "--font-display-face",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const bodyFace = Instrument_Sans({
+  variable: "--font-body",
+  subsets: ["latin"],
+});
+
+const codeFace = JetBrains_Mono({
+  variable: "--font-code",
   subsets: ["latin"],
 });
 
@@ -19,8 +24,16 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
-      <body className="flex min-h-full flex-col">{children}</body>
+    <html
+      lang="en"
+      className={`${displayFace.variable} ${bodyFace.variable} ${codeFace.variable} h-full`}
+    >
+      <body className="relative flex min-h-full flex-col">
+        <div className="aurora pointer-events-none fixed inset-0" aria-hidden="true">
+          <div className="aurora-grid absolute inset-0" />
+        </div>
+        <div className="relative flex min-h-full flex-1 flex-col">{children}</div>
+      </body>
     </html>
   );
 }
